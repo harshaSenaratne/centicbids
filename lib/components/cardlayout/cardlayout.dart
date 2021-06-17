@@ -6,29 +6,34 @@ import 'package:flutter_countdown_timer/current_remaining_time.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 
 class CustomCard extends StatefulWidget {
-  CustomCard({@required this.name, @required this.basePrice, @required this.currentBid,this.imagePath,this.remainingTime});
-
-
+  CustomCard({@required this.name, @required this.basePrice, @required this.currentBid,this.imagePath,this.remainingTime,this.ontap});
 
   final String name;
-  final String basePrice;
-  final String currentBid;
+  final int basePrice;
+  final int currentBid;
   final String imagePath;
   final String remainingTime;
-
+  final Function ontap;
 
   @override
   _CustomCardState createState() => _CustomCardState();
 }
 
 class _CustomCardState extends State<CustomCard> {
+   // _CustomCardState({String remainingTime}){
+   //
+   //   this.x = remainingTime;
+   // }
+
   CountdownTimerController controller;
-  int endTime = DateTime.now().millisecondsSinceEpoch + 1000 * 30;
+
+
+  int endTime = DateTime.now().millisecondsSinceEpoch + 1000 ;
 
   @override
   void initState() {
     super.initState();
-    controller = CountdownTimerController(endTime: endTime, onEnd: onEnd);
+    controller = CountdownTimerController(endTime: endTime*int.parse(widget.remainingTime), onEnd: onEnd);
   }
 
   void onEnd() {
@@ -45,14 +50,7 @@ class _CustomCardState extends State<CustomCard> {
     return    Padding(
         padding: EdgeInsets.only(top: 5.0, bottom: 2.0, left: 5.0, right: 5.0),
         child: InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => BidDetail(
-                      assetPath: widget.imagePath,
-                      cookieprice:widget.basePrice,
-                      cookiename: widget.name
-                  )));
-            },
+            onTap: widget.ontap,
             child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
@@ -72,10 +70,6 @@ class _CustomCardState extends State<CustomCard> {
                             Text("Base Price : ${widget.basePrice}",style:  TextStyle(
                                 fontFamily: 'Varela',
                                 fontSize: 10.0) )
-                            // isFavorite
-                            //     ? Icon(Icons.favorite, color: Color(0xFFEF7532))
-                            //     : Icon(Icons.favorite_border,
-                            //     color: Color(0xFFEF7532))
                           ])),
                   Hero(
                       tag: widget.imagePath,
@@ -85,13 +79,8 @@ class _CustomCardState extends State<CustomCard> {
                           decoration: BoxDecoration(
                               image: DecorationImage(
                                   image: AssetImage(widget.imagePath),
-                                  fit: BoxFit.contain)))),
-
-                  // Text( "${widget.remainingTime}",
-                  //     style: TextStyle(
-                  //         color: Color(0xFFCC8053),
-                  //         fontFamily: 'Varela',
-                  //         fontSize: 14.0)),
+                                  fit: BoxFit.contain)))
+                  ),
 
                   CountdownTimer(
                     controller: controller,
@@ -99,7 +88,14 @@ class _CustomCardState extends State<CustomCard> {
                     endTime: endTime,
                     widgetBuilder: (_, CurrentRemainingTime time) {
                       if (time == null) {
-                        return Text('Closed Bid',style: Theme.of(context).textTheme.bodyText2,);
+                        return Text('Closed Bid',style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Roboto',
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            color: Colors.red
+                        ));
                       }
                       return Text(
                           '${time.hours??"0"} h  ${time.min??"0"} m ${time.sec??"0"} s',style: TextStyle(

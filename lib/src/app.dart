@@ -1,3 +1,4 @@
+import 'package:centicbids/src/screens/home/home.dart';
 import 'package:centicbids/src/screens/login/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue
       ),
 
-      home: Login(),
+      home: HomeBlocProvider(),
     );
   }
 }
