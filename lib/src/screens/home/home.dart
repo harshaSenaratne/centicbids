@@ -1,6 +1,7 @@
 import 'package:centicbids/common/model/product_model.dart';
 import 'package:centicbids/components/appbar/custom_appbar.dart';
 import 'package:centicbids/components/cardlayout/cardlayout.dart';
+import 'package:centicbids/components/custom_dialog.dart';
 import 'package:centicbids/src/screens/home/bloc/home_bloc.dart';
 import 'package:centicbids/src/screens/home/bloc/home_event.dart';
 import 'package:centicbids/src/screens/home/bloc/home_state.dart';
@@ -35,6 +36,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final auth = FirebaseAuth.instance;
+  UserCredential user;
   HomeRepo homeRepo = HomeRepo();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -51,7 +53,6 @@ class _HomeState extends State<Home> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-
                       TextFormField(
                         inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                         controller: _textEditingController,
@@ -95,28 +96,21 @@ class _HomeState extends State<Home> {
   }
 
 
-  userVerification({String imagePath,String basePrice,String name}) {
-    // if ( auth.currentUser != null) {
-    //   Navigator.of(context).push(
-    //       MaterialPageRoute(builder: (context) => BidDetail(
-    //           assetPath: imagePath,
-    //           cookieprice:basePrice,
-    //           cookiename:name
-    //       )));
-    // } else {
-    //   Navigator.of(context).push(
-    //       MaterialPageRoute(builder: (context) => Login(
-    //       )
-    //   ));
-    //
-    //       }
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => BidDetail(
-            assetPath: imagePath,
-            cookieprice:basePrice,
-            cookiename:name
-        )));
-  }
+  // userVerification({BuildContext context, ProductModel selectedProduct}) async{
+  //   if(auth.currentUser?.uid !=null){
+  //     return await showInformationDialog(context: context,selectedProduct: selectedProduct);
+  //   }
+  //   else{
+  //     // return Login();
+  //     final action = await CustomDialog.cstmDialog(context, "invalid_user", "Oops", "Please login to continue");
+  //     if (action[0] == DialogAction.yes) {
+  //       Navigator.of(context).push(MaterialPageRoute(builder: (context) => Login()));
+  //     }
+  //   else {
+  //   Navigator.of(context).pop();
+  //   }
+  //   }
+  // }
 
   calculateRemainingTime(Timestamp product_endtime){
     int x = product_endtime.toDate().difference(DateTime.now()).inSeconds;
@@ -129,7 +123,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: CustomAppBar(
         title: Text(
-          "CenticBids",
+          auth?.currentUser?.email??"",
           style: Theme.of(context).textTheme.headline6,
         ),
         actions: [
@@ -173,9 +167,13 @@ class _HomeState extends State<Home> {
                         name: value.name,
                         basePrice:  value.basePrice,
                         currentBid: value.currentBid,
-                        imagePath: "assets/cookiemint.jpg",
+                        imagePath: value.imagePath,
                         remainingTime:calculateRemainingTime(value.bidEndDateTime).toString(),
-                        ontap:() async =>  await showInformationDialog(context: context,selectedProduct: value)
+                        ontap:() async{
+                          await showInformationDialog(context: context,selectedProduct: value);
+                        }
+                        //async => await userVerification(context: context,selectedProduct: value)
+                        ///async =>
                             //userVerification(name:"Cookie mint",basePrice: "\$3.99" ,imagePath:value.imagePath ),
                       );
                     }).toList()

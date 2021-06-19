@@ -35,7 +35,10 @@ dependencies:
   flutter_bloc: ^6.0.5
   flutter_countdown_timer: 3.0.1
   cloud_firestore: 0.14.3
+  firebase_messaging: 8.0.0-dev.1
+  flutter_local_notifications: 4.0.1+2
   fluttertoast: 7.0.2
+  cached_network_image: 2.4.0
 
 
 

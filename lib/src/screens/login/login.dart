@@ -103,11 +103,22 @@ class _LoginState extends State<Login> {
                       Container(
                         height: 40.0,
                         child: GestureDetector(
-                          onTap: (){
-                            auth.signInWithEmailAndPassword(email: _email, password: _password).then((value) {
-                              _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
-                           });
+                          onTap: () async{
+                            UserCredential user = await auth.signInWithEmailAndPassword(email: _email, password: _password);
+                            print(user);
+                            if(user.user.uid !=null){
+                                 _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
+                                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
+                            }
+                            else{
+                              _showToast(message:"Login Failed",color: Colors.red,icon: Icons.new_releases );
+
+                            }
+
+                           //      .then((value) {
+                           //    _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
+                           //    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
+                           // });
                           },
                           child: Material(
                             borderRadius: BorderRadius.circular(20.0),
