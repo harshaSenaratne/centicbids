@@ -9,12 +9,18 @@ class HomeDAO extends BaseDao {
   FirebaseFirestore _firestore = DatabaseProvider.firestore;
 
   Stream<List<ProductModel>> fetchProducts() {
+    debugPrint("**fetchProducts is called**");
     return BaseQuery().where("active",isEqualTo:true).snapshots().map((event)
     => event.docs.map((doc) => ProductModel.fromMap(doc.data())).toList());
   }
 
   Future<bool> submit({ProductModel bidDetails})async{
-    await _firestore.collection("products").doc(bidDetails.id).set(bidDetails.toMap()).then((value) => true);
+ //   await _firestore.collection("products").doc(bidDetails.id).update({'token': pushToken}).then((value) => true);
+
+    await _firestore.collection("products").doc(bidDetails.id).update({'highest_bidder.uid':bidDetails.bidder.uid,
+    'highest_bidder.amount':bidDetails.bidder.amount,
+     'current_bid':bidDetails.bidder.amount,
+    }).then((value) => true);
   }
 
 }

@@ -1,3 +1,4 @@
+import 'package:centicbids/common/services/auth_service.dart';
 import 'package:centicbids/components/custom_toast/custom_toast.dart';
 import 'package:centicbids/src/screens/home/home.dart';
 import 'package:centicbids/src/screens/signup/signup.dart';
@@ -66,6 +67,7 @@ class _LoginState extends State<Login> {
                   child: Column(
                     children: <Widget>[
                       TextField(
+                        key: const ValueKey("username"),
                         decoration: InputDecoration(
                             labelText: 'EMAIL',
                             labelStyle: TextStyle(
@@ -83,6 +85,7 @@ class _LoginState extends State<Login> {
                       ),
                       SizedBox(height: 20.0),
                       TextField(
+                        key: const ValueKey("password"),
                         decoration: InputDecoration(
                             labelText: 'PASSWORD',
                             labelStyle: TextStyle(
@@ -103,22 +106,19 @@ class _LoginState extends State<Login> {
                       Container(
                         height: 40.0,
                         child: GestureDetector(
+                          key: const ValueKey("login"),
                           onTap: () async{
-                            UserCredential user = await auth.signInWithEmailAndPassword(email: _email, password: _password);
-                            print(user);
-                            if(user.user.uid !=null){
-                                 _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
-                                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
-                            }
-                            else{
-                              _showToast(message:"Login Failed",color: Colors.red,icon: Icons.new_releases );
+                            final String retVal = await Auth(auth: auth).signIn(
+                              email:_email ,
+                              password: _password,
+                            );
 
+                            if (retVal == "Success") {
+                              _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
+                            } else {
+                                 _showToast(message:"Login Failed",color: Colors.red,icon: Icons.new_releases );
                             }
-
-                           //      .then((value) {
-                           //    _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
-                           //    Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
-                           // });
                           },
                           child: Material(
                             borderRadius: BorderRadius.circular(20.0),
@@ -149,8 +149,8 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(width: 5.0),
                   InkWell(
+                    key: const ValueKey("register"),
                     onTap: () {
-                     // Navigator.of(context).pushReplacement(MaterialPageRoute(builder:(context)=>SignUp()));
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>SignUp() ));
 
                     },
@@ -167,70 +167,5 @@ class _LoginState extends State<Login> {
               )
             ],
           ));
-    //   Scaffold(
-    //   appBar: AppBar(title: Text("Welcome To CenticBids",style: Theme.of(context).textTheme.headline5,)),
-    //   body: Column(
-    //     children: [
-    //       Padding(
-    //         padding: EdgeInsets.all(8.0),
-    //           child:
-    //       TextField(
-    //         keyboardType:TextInputType.emailAddress,
-    //         style: Theme.of(context).textTheme.bodyText2,
-    //         decoration: InputDecoration(
-    //           hintText:"Email"
-    //         ),
-    //         onChanged:(value){
-    //           setState(() {
-    //             _email = value.toString();
-    //           });
-    //         },
-    //       )),
-    //       Padding(
-    //           padding: EdgeInsets.all(8.0),
-    //           child:
-    //           TextField(
-    //             style: Theme.of(context).textTheme.bodyText2,
-    //              obscureText:true,
-    //               decoration: InputDecoration(
-    //                   hintText:"Password"
-    //               ),
-    //             onChanged:(value){
-    //               setState(() {
-    //                 _password = value.toString();
-    //               });
-    //             },
-    //           )
-    //
-    //       ),
-    //       Row(
-    //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-    //         children: [
-    //           RaisedButton(
-    //             color: Theme.of(context).accentColor,
-    //             child: Text("Sign In",style: Theme.of(context).textTheme.button,),
-    //             onPressed: (){
-    //             auth.signInWithEmailAndPassword(email: _email, password: _password).then((value) =>
-    //                 Navigator.of(context).pushReplacement(MaterialPageRoute(builder:(context)=>Home()))
-    //
-    //             );
-    //             }),
-    //           RaisedButton(
-    //             color: Theme.of(context).accentColor,
-    //             child: Text("Sign Up",style: Theme.of(context).textTheme.button,),
-    //             onPressed: (){
-    //               auth.createUserWithEmailAndPassword(email: _email, password: _password).then((value) =>
-    //                   Navigator.of(context).pushReplacement(MaterialPageRoute(builder:(context)=>Home() ))
-    //               );
-    //
-    //             },
-    //           )
-    //
-    //         ],
-    //       )
-    //
-    //     ],
-    //   ),
-    // );
   }
 }

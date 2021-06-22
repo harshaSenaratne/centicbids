@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'bidder.dart';
+import 'bidder_model.dart';
 
 class ProductModel {
   ProductModel(

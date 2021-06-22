@@ -1,12 +1,11 @@
 import 'package:centicbids/common/model/product_model.dart';
 import 'package:centicbids/components/appbar/custom_appbar.dart';
 import 'package:centicbids/components/cardlayout/cardlayout.dart';
-import 'package:centicbids/components/custom_dialog.dart';
+import 'package:centicbids/components/custom_toast/custom_toast.dart';
 import 'package:centicbids/src/screens/home/bloc/home_bloc.dart';
 import 'package:centicbids/src/screens/home/bloc/home_event.dart';
 import 'package:centicbids/src/screens/home/bloc/home_state.dart';
 import 'package:centicbids/src/screens/home/repository/home_repo.dart';
-import 'package:centicbids/src/screens/item_detail/item_detail.dart';
 import 'package:centicbids/src/screens/login/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,8 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomeBlocProvider extends StatelessWidget {
   const HomeBlocProvider({Key key}) : super(key: key);
@@ -32,14 +30,28 @@ class Home extends StatefulWidget {
 
   @override
   _HomeState createState() => _HomeState();
+
 }
 
 class _HomeState extends State<Home> {
   final auth = FirebaseAuth.instance;
   UserCredential user;
   HomeRepo homeRepo = HomeRepo();
+  FToast fToast;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  _showToast({String message, Color color,IconData icon}) {
+    fToast.showToast(
+      child: CustomToast(
+        toastColor: color,
+        toastMessage: message,
+        icon:icon ,
+      ),
+      gravity: ToastGravity.TOP,
+      toastDuration: Duration(seconds: 2),
+    );
+  }
 
   Future<void> showInformationDialog(
       {BuildContext context, ProductModel selectedProduct}) async {
@@ -80,12 +92,18 @@ class _HomeState extends State<Home> {
               actions: <Widget>[
                 RaisedButton(
                   child: Text('Submit'),
-                  onPressed: (){
+                  onPressed: () async{
                     if(_formKey.currentState.validate()){
-                      // Do something like updating SharedPreferences or User Settings etc.
                       selectedProduct.currentBid  = int.parse(_textEditingController.value.text);
-                      homeRepo.placeBid(bidDetails:selectedProduct);
-                     // Navigator.of(context).pop();
+                     await homeRepo.placeBid(bidDetails:selectedProduct).then((value) {
+                       if(value !=null){
+                         _showToast(message: "Submission Successful" ,color: Colors.green,icon: Icons.check,);
+                         Navigator.of(context).pop();
+                       }
+                       {
+                         _showToast(message: "Submission Failed" ,color: Colors.red,icon: Icons.new_releases,);
+                       }
+                     });
                     }
                   },
                 ),
@@ -96,25 +114,16 @@ class _HomeState extends State<Home> {
   }
 
 
-  // userVerification({BuildContext context, ProductModel selectedProduct}) async{
-  //   if(auth.currentUser?.uid !=null){
-  //     return await showInformationDialog(context: context,selectedProduct: selectedProduct);
-  //   }
-  //   else{
-  //     // return Login();
-  //     final action = await CustomDialog.cstmDialog(context, "invalid_user", "Oops", "Please login to continue");
-  //     if (action[0] == DialogAction.yes) {
-  //       Navigator.of(context).push(MaterialPageRoute(builder: (context) => Login()));
-  //     }
-  //   else {
-  //   Navigator.of(context).pop();
-  //   }
-  //   }
-  // }
-
   calculateRemainingTime(Timestamp product_endtime){
-    int x = product_endtime.toDate().difference(DateTime.now()).inSeconds;
-    return x;
+    int calculatedRemainingTime = product_endtime.toDate().difference(DateTime.now()).inSeconds;
+    return calculatedRemainingTime;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fToast = FToast(context);
   }
 
 
@@ -128,12 +137,13 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
+            key:const ValueKey("logout"),
             onPressed: () {
               auth.signOut().then((value) => Navigator.of(context)
                   .pushReplacement(
                       MaterialPageRoute(builder: (context) => Login())));
             },
-            icon: Icon(Icons.exit_to_app, color: Color(0xFF545D68)),
+            icon: Icon(Icons.exit_to_app, color: Colors.white),
           )
         ],
       ),
@@ -142,8 +152,7 @@ class _HomeState extends State<Home> {
     // ignore: missing_return
     builder: (context, state) {
         if(state is ProductDetailsLoadedState){
-          print("state--> ${state.productDetails}");
-          return     ListView(
+          return ListView(
             padding: EdgeInsets.only(left: 20),
             children: <Widget>[
               SizedBox(height: 15.0),
@@ -170,11 +179,13 @@ class _HomeState extends State<Home> {
                         imagePath: value.imagePath,
                         remainingTime:calculateRemainingTime(value.bidEndDateTime).toString(),
                         ontap:() async{
-                          await showInformationDialog(context: context,selectedProduct: value);
+                          if(auth.currentUser?.email != null){
+                            await showInformationDialog(context: context,selectedProduct: value);
+                          }
+                          else if(auth.currentUser?.email == null){
+                            _showToast(message: "Please login to proceed",color: Colors.orange,icon: Icons.new_releases);
+                          }
                         }
-                        //async => await userVerification(context: context,selectedProduct: value)
-                        ///async =>
-                            //userVerification(name:"Cookie mint",basePrice: "\$3.99" ,imagePath:value.imagePath ),
                       );
                     }).toList()
 

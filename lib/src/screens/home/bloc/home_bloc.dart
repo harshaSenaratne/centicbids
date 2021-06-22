@@ -19,7 +19,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
     else if(event is ProductDetailsLoadedEvent){
       print("calling ProductDetailsLoadedEvent **** ");
-
       yield ProductDetailsLoadedState(productDetails: event.products);
     }
   }

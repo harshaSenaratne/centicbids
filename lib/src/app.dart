@@ -1,10 +1,12 @@
+import 'package:centicbids/common/constants/constants.dart';
+import 'package:centicbids/common/shared_preferences/shared_preferences.dart';
 import 'package:centicbids/src/screens/home/home.dart';
 import 'package:centicbids/src/screens/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class App extends StatefulWidget {
   @override
@@ -16,14 +18,15 @@ class _AppState extends State<App> {
 
   String pushToken = '';
 
-  String _homeScreenText = "Waiting for token...";
   String _messageText = "Waiting for message...";
+
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    PreferenceUtils.init();
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -54,25 +57,12 @@ class _AppState extends State<App> {
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
       setState(() {
-        _homeScreenText = "Push Messaging token: $token";
         pushToken = token;
       });
-      asyncFunc();
+      PreferenceUtils.setString(APP_CONST.SHARED_PREFERENCE_PUSH_TOKEN, pushToken);
+
     });
   }
-
-  asyncFunc() async { // Async func to handle Futures easier; or use Future.then
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.setString('pushToken', pushToken);
-
-    String token = prefs.getString('pushToken');
-
-    print("myyyyyyyyyyy tokennn$token");
-    
-  }
-
-
 
   @override
   Widget build(BuildContext context) {

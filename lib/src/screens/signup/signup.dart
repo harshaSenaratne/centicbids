@@ -1,3 +1,5 @@
+import 'package:centicbids/common/services/auth_service.dart';
+import 'package:centicbids/common/shared_preferences/shared_preferences.dart';
 import 'package:centicbids/components/custom_toast/custom_toast.dart';
 import 'package:centicbids/src/screens/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,15 +13,19 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+
   String _email , _password;
   final auth = FirebaseAuth.instance;
   FToast fToast;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    PreferenceUtils.init();
     fToast = FToast(context);
+
   }
 
   _showToast({String message, Color color,IconData icon}) {
@@ -66,7 +72,8 @@ class _SignUpState extends State<SignUp> {
               child: Column(
                 children: <Widget>[
                   TextField(
-                    decoration: InputDecoration(
+                      key: const ValueKey("username"),
+                      decoration: InputDecoration(
                         labelText: 'EMAIL',
                         labelStyle: TextStyle(
                             fontFamily: 'Varela',
@@ -80,12 +87,12 @@ class _SignUpState extends State<SignUp> {
                         setState(() {
                           _email = value.toString();
                         });
-
                       }
                   ),
                   SizedBox(height: 10.0),
                   TextField(
-                    decoration: InputDecoration(
+                      key: const ValueKey("password"),
+                      decoration: InputDecoration(
                         labelText: 'PASSWORD ',
                         labelStyle: TextStyle(
                             fontFamily: 'Varela',
@@ -98,7 +105,6 @@ class _SignUpState extends State<SignUp> {
                         setState(() {
                           _password = value.toString();
                         });
-
                       }
                   ),
                   SizedBox(height: 50.0),
@@ -110,16 +116,21 @@ class _SignUpState extends State<SignUp> {
                         color: Colors.green,
                         elevation: 7.0,
                         child: GestureDetector(
-                          onTap: () {
-                            auth.createUserWithEmailAndPassword(email: _email, password: _password).then((value) {
+                          key: const ValueKey("createAccount"),
+                          onTap: () async{
+                            final String retVal =
+                                await Auth(auth:auth).createAccount(
+                              email: _email,
+                              password: _password,
+                            );
+                            if (retVal == "Success") {
                               _showToast(message: "User created",color: Colors.green,icon: Icons.check,);
                               Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => Login()));
-                            }).catchError((onError){
-                              _showToast(message: onError.toString() ,color: Colors.red,icon: Icons.new_releases,);
+                                  MaterialPageRoute(builder: (context) => Login()));
 
-                            });
+                            } else {
+                                 _showToast(message: retVal ,color: Colors.red,icon: Icons.new_releases,);
+                            }
                           },
                           child: Center(
                             child: Text(
