@@ -20,3 +20,8 @@ flutter run
 
 ## Note :  Make sure to run the CenticBids Serverless application locally and add products to start bidding.
 
+
+# To run test
+
+
+```  flutter drive --target = test_driver / app.dart```

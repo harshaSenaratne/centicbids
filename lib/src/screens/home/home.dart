@@ -154,24 +154,14 @@ class _HomeState extends State<Home> {
           )
         ),
         actions: [
-          auth.currentUser?.email != null?
           IconButton(
             key:const ValueKey("logout"),
             onPressed: () {
               auth.signOut().then((value) => Navigator.of(context)
                   .pushReplacement(
-                      MaterialPageRoute(builder: (context) => Login())));
-            },
-            icon: Icon(Icons.exit_to_app, color: Colors.white),
-          ):
-          IconButton(
-            key:const ValueKey("login"),
-            onPressed: () {
-              auth.signOut().then((value) => Navigator.of(context)
-                  .pushReplacement(
                   MaterialPageRoute(builder: (context) => Login())));
             },
-            icon: Icon(Icons.person, color: Colors.white),
+            icon: Icon(Icons.exit_to_app, color: Colors.white),
           )
         ],
       ),

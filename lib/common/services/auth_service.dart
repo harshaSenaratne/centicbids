@@ -30,8 +30,8 @@ class Auth {
   Future<String> signIn({String email, String password}) async {
     try {
       await auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
+        email: email?.trim(),
+        password: password?.trim(),
       ).then((value) =>    signUpDao.addPushToken(uid:value.user.uid,pushToken: pushToken));
       return "Success";
     } on FirebaseAuthException catch (e) {

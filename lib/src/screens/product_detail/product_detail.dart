@@ -62,13 +62,18 @@ class ProductDetail extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 5.0,right: 5.0),
-                  child: Text(
-                      name,
-                      style: TextStyle(
-                          fontFamily: 'Varela',
-                          fontSize: 42.0,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFFF17532))
+                  child: SizedBox(
+                    width:300 ,
+                    height: 50,
+                    child: Text(
+                        name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontFamily: 'Varela',
+                            fontSize: 42.0,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFF17532))
+                    ),
                   ),
                 ),
               ],

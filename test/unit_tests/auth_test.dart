@@ -28,14 +28,22 @@ void main() {
   });
   final MockFirebaseAuth mockFirebaseAuth = MockFirebaseAuth();
   BehaviorSubject<MockFirebaseUser> user = BehaviorSubject<MockFirebaseUser>();
-  Auth auth_repo = Auth(auth: mockFirebaseAuth);
-  when(auth_repo.auth.authStateChanges()).thenAnswer((_){
+  Auth authRepo = Auth(auth: mockFirebaseAuth);
+  when(authRepo.auth.authStateChanges()).thenAnswer((_){
     return user;
   });
 
   group("user repository test",(){
-    test("sign in with email & password", (){
+    test("sign in with email & password", () async{
+      String result = await authRepo.signIn(email: "harsha@gmail.com",password: "harsha@123");
+      expect(result, "Success");
     });
+
+    test("sign up with email & password", () async{
+      String result = await authRepo.signIn(email: "demouser@gmail.com",password: "demo@123");
+      expect(result, "Success");
+    });
+
   });
 
 
