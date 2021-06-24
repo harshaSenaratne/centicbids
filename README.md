@@ -1,16 +1,22 @@
-# centicbids
+# CenticBids Auction Mobile Application
 
-A new Flutter application.
+Mobile app which allows users to view and bid for ongoing auctions.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter application.
+Once cloned, navigate to root folder and run the following command.
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter pub get
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Usage
+To run the application
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter run
+```
+
+
+## Note :  Make sure to run the CenticBids Serverless application locally and add products to start bidding.
+

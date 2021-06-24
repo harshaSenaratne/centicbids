@@ -1,10 +1,7 @@
 
 import 'package:centicbids/src/app.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-
 
 
 void main() async{

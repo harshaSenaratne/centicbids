@@ -21,9 +21,12 @@ class _LoginState extends State<Login> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    //Initialize flutter toast
     fToast = FToast(context);
   }
 
+  //Display toast message
   _showToast({String message, Color color,IconData icon}) {
     fToast.showToast(
       child: CustomToast(
@@ -112,7 +115,6 @@ class _LoginState extends State<Login> {
                               email:_email ,
                               password: _password,
                             );
-
                             if (retVal == "Success") {
                               _showToast(message:"Login Successful",color: Colors.green,icon: Icons.check );
                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeBlocProvider()));
@@ -158,6 +160,29 @@ class _LoginState extends State<Login> {
                       'Register',
                       style: TextStyle(
                           color: Colors.green,
+                          fontFamily: 'Varela',
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline),
+                    ),
+                  )
+                ],
+              ),
+
+              SizedBox(height: 15.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(width: 5.0),
+                  InkWell(
+                    key: const ValueKey("continue without login"),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeBlocProvider() ));
+
+                    },
+                    child: Text(
+                      'Continue Without Login',
+                      style: TextStyle(
+                          color: Colors.lightGreen,
                           fontFamily: 'Varela',
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline),

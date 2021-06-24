@@ -1,7 +1,6 @@
 import 'package:centicbids/common/constants/constants.dart';
 import 'package:centicbids/common/shared_preferences/shared_preferences.dart';
 import 'package:centicbids/src/screens/home/home.dart';
-import 'package:centicbids/src/screens/login/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,30 +19,31 @@ class _AppState extends State<App> {
 
   String _messageText = "Waiting for message...";
 
-
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    //Initialize shared preference
     PreferenceUtils.init();
 
+    //Firebase push notification configuration
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         setState(() {
-          _messageText = "Push Messaging message: $message";
+          _messageText = "$message";
         });
-        print("onMessage: $message");
+        print(" $message");
       },
       onLaunch: (Map<String, dynamic> message) async {
         setState(() {
-          _messageText = "Push Messaging message: $message";
+          _messageText = "$message";
         });
         print("onLaunch: $message");
       },
       onResume: (Map<String, dynamic> message) async {
         setState(() {
-          _messageText = "Push Messaging message: $message";
+          _messageText = "$message";
         });
         print("onResume: $message");
       },
@@ -54,13 +54,14 @@ class _AppState extends State<App> {
         .listen((IosNotificationSettings settings) {
       print("Settings registered: $settings");
     });
+
+    // Saving push notification token to the shared preferences
     _firebaseMessaging.getToken().then((String token) {
       assert(token != null);
       setState(() {
         pushToken = token;
       });
       PreferenceUtils.setString(APP_CONST.SHARED_PREFERENCE_PUSH_TOKEN, pushToken);
-
     });
   }
 
@@ -68,6 +69,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Login App",
       theme: ThemeData(
         accentColor: Colors.orange,

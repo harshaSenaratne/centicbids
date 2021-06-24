@@ -23,11 +23,15 @@ class _SignUpState extends State<SignUp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    //Initializing shared preferences
     PreferenceUtils.init();
+
+    //Initialize flutter toast
     fToast = FToast(context);
 
   }
 
+  //Display toast message
   _showToast({String message, Color color,IconData icon}) {
     fToast.showToast(
       child: CustomToast(
@@ -39,7 +43,6 @@ class _SignUpState extends State<SignUp> {
       toastDuration: Duration(seconds: 2),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

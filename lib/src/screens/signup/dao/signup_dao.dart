@@ -6,7 +6,7 @@ class SignUpDao extends BaseDao {
   SignUpDao() : super("users");
   FirebaseFirestore _firestore = DatabaseProvider.firestore;
 
-
+  //Saving push token to the user collection
   Future<bool> addPushToken({String uid, String pushToken})async{
     await _firestore.collection("users").doc(uid).update({'token': pushToken}).then((value) => true);
   }

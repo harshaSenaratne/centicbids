@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:centicbids/src/screens/home/bloc/home_event.dart';
 import 'package:centicbids/src/screens/home/bloc/home_state.dart';
 import 'package:centicbids/src/screens/home/repository/home_repo.dart';
@@ -18,13 +17,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       yield*  _mapProductDetailData();
     }
     else if(event is ProductDetailsLoadedEvent){
-      print("calling ProductDetailsLoadedEvent **** ");
       yield ProductDetailsLoadedState(productDetails: event.products);
     }
   }
 
   Stream<HomeState> _mapProductDetailData() async* {
-    print("calling _mapProductDetailData **** ");
     streamSubscription?.cancel();
     yield ProductDetailsLoadingState();
     streamSubscription = homeRepo.fetchProductDetails().listen((eve) async {

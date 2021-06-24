@@ -9,16 +9,19 @@ class CustomCard extends StatefulWidget {
       {@required this.name,
       @required this.basePrice,
       @required this.currentBid,
-      this.imagePath,
-      this.remainingTime,
-      this.ontap});
+      this.imagePath, this.heroTag,
+      this.remainingTime, this.viewDetails, this.ontap});
 
   final String name;
   final int basePrice;
   final int currentBid;
   final String imagePath;
+  final String heroTag;
   final String remainingTime;
   final Function ontap;
+  final Function viewDetails;
+
+ // final Function onShowDescription;
 
   @override
   _CustomCardState createState() => _CustomCardState();
@@ -33,7 +36,7 @@ class _CustomCardState extends State<CustomCard> {
   void initState() {
     super.initState();
     controller = CountdownTimerController(
-        endTime: endTime * int.parse(widget.remainingTime), onEnd: onEnd);
+        endTime: endTime+ int.parse(widget.remainingTime), onEnd: onEnd);
   }
 
   void onEnd() {
@@ -51,7 +54,7 @@ class _CustomCardState extends State<CustomCard> {
     return Padding(
         padding: EdgeInsets.only(top: 5.0, bottom: 2.0, left: 5.0, right: 5.0),
         child: InkWell(
-            onTap: widget.ontap,
+          onTap: widget.viewDetails,
             child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15.0),
@@ -69,11 +72,12 @@ class _CustomCardState extends State<CustomCard> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text("Base Price : \$ ${widget.basePrice}",
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontFamily: 'Varela', fontSize: 10.0))
                           ])),
                   Hero(
-                      tag: widget.imagePath,
+                      tag: widget.heroTag,
                       child: Container(
                           height: 75.0,
                           width: 75.0,
@@ -81,7 +85,6 @@ class _CustomCardState extends State<CustomCard> {
                               image: DecorationImage(
                                   image: NetworkImage(widget.imagePath),
                                   fit: BoxFit.contain))
-
                       )
                   ),
                   CountdownTimer(
@@ -118,11 +121,14 @@ class _CustomCardState extends State<CustomCard> {
                           fontFamily: 'Varela',
                           fontSize: 18.0)),
                   Text("Current Bid",
+                      overflow: TextOverflow.ellipsis,
+
                       style: TextStyle(
                           color: Color(0xFFCC8053),
                           fontFamily: 'Varela',
                           fontSize: 10.0)),
                   Text(widget.name,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Color(0xFF575E67),
                           fontFamily: 'Varela',
@@ -132,16 +138,19 @@ class _CustomCardState extends State<CustomCard> {
                       child: Container(color: Color(0xFFEBEBEB), height: 1.0)),
                   Padding(
                       padding: EdgeInsets.only(left: 5.0, right: 5.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text('Bid Now',
-                                style: TextStyle(
-                                    fontFamily: 'Varela',
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFD17E50),
-                                    fontSize: 16.0)),
-                          ])),
+                      child: GestureDetector(
+                        onTap: widget.ontap,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text('Bid Now',
+                                  style: TextStyle(
+                                      fontFamily: 'Varela',
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFD17E50),
+                                      fontSize: 16.0)),
+                            ]),
+                      )),
                 ]))));
   }
 }

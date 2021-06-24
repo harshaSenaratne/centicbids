@@ -30,6 +30,18 @@ void main() {
     // Connect to the Flutter driver before running any tests.
     setUpAll(() async {
       driver = await FlutterDriver.connect();
+      // auth.currentUser.delete();
+      // FirebaseFirestore.instance
+      //     .collection("users")
+      //     .where("email", isEqualTo : "testuser@gmail.com ")
+      //     .get().then((value){
+      //   value.docs.forEach((element) {
+      //     FirebaseFirestore.instance.collection("eventDetails").doc(element.id).delete().then((value){
+      //       print("Success!");
+      //     });
+      //   });
+      // });
+
     });
 
     // Close the connection to the driver after the tests have completed.
@@ -38,6 +50,8 @@ void main() {
         driver.close();
       }
     });
+
+
 
     test('create account', () async {
       if (await isPresent(logOutButton)) {

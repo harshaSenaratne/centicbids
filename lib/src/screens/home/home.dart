@@ -6,6 +6,7 @@ import 'package:centicbids/src/screens/home/bloc/home_bloc.dart';
 import 'package:centicbids/src/screens/home/bloc/home_event.dart';
 import 'package:centicbids/src/screens/home/bloc/home_state.dart';
 import 'package:centicbids/src/screens/home/repository/home_repo.dart';
+import 'package:centicbids/src/screens/product_detail/product_detail.dart';
 import 'package:centicbids/src/screens/login/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uuid/uuid.dart';
 
 class HomeBlocProvider extends StatelessWidget {
   const HomeBlocProvider({Key key}) : super(key: key);
@@ -38,6 +40,7 @@ class _HomeState extends State<Home> {
   UserCredential user;
   HomeRepo homeRepo = HomeRepo();
   FToast fToast;
+  var uuid = Uuid();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -53,6 +56,7 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Display dialog box to enter the bidding amount
   Future<void> showInformationDialog(
       {BuildContext context, ProductModel selectedProduct}) async {
     return await showDialog(context: context,
@@ -72,9 +76,14 @@ class _HomeState extends State<Home> {
                           if(value.isEmpty){
                             return "Place your bid to proceed";
                           }
-                          else if (selectedProduct.currentBid >int.parse(value)){
-                            return "Amount should exceed current bid";
+                          else if(selectedProduct.basePrice >int.parse(value)){
+                            return "Bid amount should exceed base price";
+
                           }
+                          else if (selectedProduct.currentBid >int.parse(value) || selectedProduct.currentBid == int.parse(value)){
+                            return "Bid amount should exceed current price";
+                          }
+                          
                           else{
                             return null;
                           }
@@ -95,15 +104,16 @@ class _HomeState extends State<Home> {
                   onPressed: () async{
                     if(_formKey.currentState.validate()){
                       selectedProduct.currentBid  = int.parse(_textEditingController.value.text);
-                     await homeRepo.placeBid(bidDetails:selectedProduct).then((value) {
-                       if(value !=null){
-                         _showToast(message: "Submission Successful" ,color: Colors.green,icon: Icons.check,);
-                         Navigator.of(context).pop();
-                       }
-                       {
-                         _showToast(message: "Submission Failed" ,color: Colors.red,icon: Icons.new_releases,);
-                       }
-                     });
+                      await homeRepo.placeBid(bidDetails:selectedProduct).then((value) {
+                        if(value){
+                          _showToast(message: "Submission Successful" ,color: Colors.green,icon: Icons.check,);
+                          Navigator.of(context).pop();
+                        }
+                        else
+                        {
+                          _showToast(message: "Submission Failed" ,color: Colors.red,icon: Icons.new_releases,);
+                        }
+                      });
                     }
                   },
                 ),
@@ -114,8 +124,9 @@ class _HomeState extends State<Home> {
   }
 
 
+//Calculates the time difference between bid end time & current date time
   calculateRemainingTime(Timestamp product_endtime){
-    int calculatedRemainingTime = product_endtime.toDate().difference(DateTime.now()).inSeconds;
+    int calculatedRemainingTime = product_endtime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch;
     return calculatedRemainingTime;
   }
 
@@ -126,16 +137,24 @@ class _HomeState extends State<Home> {
     fToast = FToast(context);
   }
 
+  // Pull down to referesh the list
+  Future<void> _pullToRefresh() async{
+    BlocProvider.of<HomeBloc>(context).add(FetchProductDetailsEvent());
+  }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           auth?.currentUser?.email??"",
-          style: Theme.of(context).textTheme.headline6,
+          style: TextStyle(
+            color: Colors.white
+          )
         ),
         actions: [
+          auth.currentUser?.email != null?
           IconButton(
             key:const ValueKey("logout"),
             onPressed: () {
@@ -144,6 +163,15 @@ class _HomeState extends State<Home> {
                       MaterialPageRoute(builder: (context) => Login())));
             },
             icon: Icon(Icons.exit_to_app, color: Colors.white),
+          ):
+          IconButton(
+            key:const ValueKey("login"),
+            onPressed: () {
+              auth.signOut().then((value) => Navigator.of(context)
+                  .pushReplacement(
+                  MaterialPageRoute(builder: (context) => Login())));
+            },
+            icon: Icon(Icons.person, color: Colors.white),
           )
         ],
       ),
@@ -152,57 +180,66 @@ class _HomeState extends State<Home> {
     // ignore: missing_return
     builder: (context, state) {
         if(state is ProductDetailsLoadedState){
-          return ListView(
-            padding: EdgeInsets.only(left: 20),
-            children: <Widget>[
-              SizedBox(height: 15.0),
-              Text(
-                "Bids",
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              SizedBox(height: 15.0),
-              Container(
-                  padding: EdgeInsets.only(right: 15.0),
-                  width: MediaQuery.of(context).size.width - 30.0,
-                  height: MediaQuery.of(context).size.height - 50.0,
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    primary: false,
-                    crossAxisSpacing: 10.0,
-                    mainAxisSpacing: 15.0,
-                    childAspectRatio: 0.8,
-                    children: state.productDetails.map((value) {
-                      return  CustomCard(
-                        name: value.name,
-                        basePrice:  value.basePrice,
-                        currentBid: value.currentBid,
-                        imagePath: value.imagePath,
-                        remainingTime:calculateRemainingTime(value.bidEndDateTime).toString(),
-                        ontap:() async{
-                          if(auth.currentUser?.email != null){
-                            await showInformationDialog(context: context,selectedProduct: value);
+          return RefreshIndicator(
+            onRefresh: _pullToRefresh,
+            child: ListView(
+              padding: EdgeInsets.only(left: 20),
+              children: <Widget>[
+                SizedBox(height: 15.0),
+                Text(
+                  "Bids",
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                SizedBox(height: 15.0),
+                Container(
+                    padding: EdgeInsets.only(right: 15.0),
+                    width: MediaQuery.of(context).size.width - 30.0,
+                    height: MediaQuery.of(context).size.height - 50.0,
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      primary: false,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 15.0,
+                      childAspectRatio: 0.8,
+                      children: state.productDetails.map((value) {
+                        return  CustomCard(
+                          name: value.name,
+                          basePrice:  value.basePrice,
+                          currentBid: value.currentBid,
+                          imagePath: value.imagePath,
+                            heroTag: uuid.v1(),
+                          remainingTime:calculateRemainingTime(value.bidEndDateTime).toString(),
+                          viewDetails: () async => Navigator.of(context)
+                              .push(
+                              MaterialPageRoute(builder: (context) => ProductDetail(
+                                name:value.name,
+                                assetPath: value.imagePath,
+                                itemDescription: value.description,
+                                itemPrice: value.basePrice,
+                                heroTag: uuid.v1(),
+                              ))),
+                          ontap:() async{
+                            if(auth.currentUser?.email != null){
+                              await showInformationDialog(context: context,selectedProduct: value);
+                            }
+                            else if(auth.currentUser?.email == null){
+                              _showToast(message: "Please login to proceed",color: Colors.orange,icon: Icons.new_releases);
+                            }
                           }
-                          else if(auth.currentUser?.email == null){
-                            _showToast(message: "Please login to proceed",color: Colors.orange,icon: Icons.new_releases);
-                          }
-                        }
-                      );
-                    }).toList()
+                        );
+                      }).toList()
 
-                  )),
-              SizedBox(height: 15.0)
-            ],
+                    )),
+                SizedBox(height: 15.0)
+              ],
+            ),
           );
-
     }
-        else {
-       return   Container();
+        else {return   Container();
         }
 
       }
       )
-
-
     );
   }
 }

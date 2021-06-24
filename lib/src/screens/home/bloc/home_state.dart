@@ -1,6 +1,6 @@
 
 import 'package:centicbids/common/model/product_model.dart';
-import 'package:centicbids/src/screens/item_detail/item_detail.dart';
+import 'package:centicbids/src/screens/product_detail/product_detail.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 

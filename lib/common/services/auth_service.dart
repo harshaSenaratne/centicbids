@@ -18,7 +18,7 @@ class Auth {
       await auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
-      ).then((value) =>    signUpDao.addPushToken(uid:value.user.uid,pushToken: pushToken));
+      );
       return "Success";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -32,7 +32,7 @@ class Auth {
       await auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
-      );
+      ).then((value) =>    signUpDao.addPushToken(uid:value.user.uid,pushToken: pushToken));
       return "Success";
     } on FirebaseAuthException catch (e) {
       return e.message;

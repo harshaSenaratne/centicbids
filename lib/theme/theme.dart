@@ -13,19 +13,19 @@ class GlobalTheme {
               fontFamily: 'Varela',
               fontStyle: FontStyle.normal,
               fontWeight: FontWeight.bold,
-              color: Color(0xFFD17E50)),
+              color:  Colors.green),
         headline5: TextStyle(
             fontSize: 24,
             fontFamily: 'Varela',
             fontStyle: FontStyle.normal,
-            color: Color(0xFFD17E50)),
+            color: Colors.green),
         headline6: TextStyle(
             fontSize: 20,
             fontFamily: 'Varela',
             fontStyle: FontStyle.normal,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.25,
-            color: Color(0xFFD17E50)),
+            color: Colors.green),
         bodyText1: TextStyle(
             fontSize: 16,
             fontFamily: 'Varela',

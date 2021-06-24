@@ -7,22 +7,16 @@ class HomeRepo {
   HomeDAO homeDAO = HomeDAO();
   final auth = FirebaseAuth.instance;
 
-
+//Retrieve products
   Stream<List<ProductModel>> fetchProductDetails() {
-
     return homeDAO.fetchProducts();
   }
 
+  //Submit bid amount
   Future<bool> placeBid({ProductModel bidDetails}) async{
     bidDetails.bidder.amount = bidDetails.currentBid;
     bidDetails.bidder.uid = auth.currentUser.uid ;
-    try{
-      await homeDAO.submit(bidDetails: bidDetails);
-      return true;
-    }
-    catch(e){
-      return false;
-    }
+    return  await homeDAO.submit(bidDetails: bidDetails);
   }
 
 
